@@ -1,0 +1,38 @@
+{
+  "name": "peer",
+  "version": "0.1.0",
+  "description": "Review Codex prompts with Fable 5 and inject a sharper peer-programmer brief before the turn runs.",
+  "author": {
+    "name": "Just Every",
+    "url": "https://github.com/just-every"
+  },
+  "homepage": "https://github.com/just-every/plugin-peer",
+  "repository": "https://github.com/just-every/plugin-peer",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "hooks",
+    "fable",
+    "ensemble",
+    "peer-review",
+    "prompt-review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Peer",
+    "shortDescription": "Fable prompt peer review for Codex",
+    "longDescription": "Peer uses Codex hooks and the Claude Code CLI (claude -p) to ask Fable 5 to review each $peer prompt before the turn. Fable inspects the workspace with read-only tools, keeps a persistent resumable session per Codex thread, and returns a structured amended brief that Peer injects as additional context.",
+    "developerName": "Just Every",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Explain Peer hook behavior",
+      "Ask Peer to improve this prompt",
+      "Check whether Peer is enabled"
+    ],
+    "brandColor": "#0F766E",
+    "websiteURL": "https://github.com/just-every/plugin-peer"
+  }
+}

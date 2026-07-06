@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${PLUGIN_ROOT}/scripts/user-prompt-submit.js",
+            "timeoutSec": 240,
+            "statusMessage": "Fable is peer-reviewing the prompt"
+          }
+        ]
+      }
+    ]
+  }
+}

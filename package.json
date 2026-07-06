@@ -1,0 +1,31 @@
+{
+  "name": "@just-every/plugin-peer",
+  "version": "0.1.0",
+  "description": "Codex hook and CLI plugin that routes prompts through Fable 5 for peer-programmer review.",
+  "license": "MIT",
+  "homepage": "https://github.com/just-every/plugin-peer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/just-every/plugin-peer.git"
+  },
+  "files": [
+    ".codex-plugin/**/*",
+    "hooks/**/*",
+    "skills/**/*",
+    "scripts/**/*",
+    "README.md",
+    "package.json"
+  ],
+  "bin": {
+    "peer": "scripts/peer.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@just-every/ensemble": "^0.2.260"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
