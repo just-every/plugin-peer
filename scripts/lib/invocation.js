@@ -1,6 +1,6 @@
 "use strict";
 
-const PEER_TOKEN = /(^|[^\w-])(?:\$peer|peer:peer)\b:?/i;
+const PEER_TOKEN = /(^|[^\w-])\$peer\b:?/i;
 
 function hasPeerInvocation(prompt) {
   return PEER_TOKEN.test(String(prompt || ""));
