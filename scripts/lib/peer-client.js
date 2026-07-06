@@ -53,12 +53,20 @@ async function runPeerReview(input, options = {}) {
   const backend = options.config && options.config.backend
     ? options.config.backend
     : (options.ensemble ? "ensemble" : cfg.backend);
-  if (backend === "ensemble") return runEnsembleReview({ ...input, prompt }, options, cfg);
+  if (backend === "ensemble") {
+    const review = await runEnsembleReview({ ...input, prompt }, options, cfg);
+    persistPeerReview({ ...input, prompt }, review, cfg);
+    return review;
+  }
   try {
-    return await runClaudeReview({ ...input, prompt }, options, cfg);
+    const review = await runClaudeReview({ ...input, prompt }, options, cfg);
+    persistPeerReview({ ...input, prompt }, review, cfg);
+    return review;
   } catch (error) {
     if (backend === "auto" && error.code === "ENOENT" && hasApiKey()) {
-      return runEnsembleReview({ ...input, prompt }, options, cfg);
+      const review = await runEnsembleReview({ ...input, prompt }, options, cfg);
+      persistPeerReview({ ...input, prompt }, review, cfg);
+      return review;
     }
     throw error;
   }
@@ -90,11 +98,6 @@ async function runClaudeReview(input, options, cfg) {
     timeoutMs: cfg.timeoutMs,
     runner: options.runClaude
   });
-  updateSessionState(STATE_NAMESPACE, input, {
-    claude_session_id: outcome.sessionId,
-    cwd,
-    model: cfg.model
-  });
   const structured = outcome.structured;
   const amended = String(structured.amended_prompt || "").trim();
   if (!amended) throw new Error("Peer review returned an empty amended_prompt.");
@@ -109,6 +112,34 @@ async function runClaudeReview(input, options, cfg) {
     claude_session_id: outcome.sessionId,
     usage: outcome.result && outcome.result.total_cost_usd
   };
+}
+
+function compactPrompt(prompt, limit = 500) {
+  return String(prompt || "").replace(/\s+/g, " ").trim().slice(0, limit);
+}
+
+function persistPeerReview(input, review, cfg, limit = 50) {
+  if (!review || review.status !== "ready") return null;
+  const state = readSessionState(STATE_NAMESPACE, input);
+  const existing = Array.isArray(state.reviews) ? state.reviews : [];
+  return updateSessionState(STATE_NAMESPACE, input, {
+    claude_session_id: review.claude_session_id || state.claude_session_id,
+    cwd: input.cwd || state.cwd,
+    model: review.model || cfg.model || state.model,
+    reviews: [
+      ...existing,
+      {
+        at: new Date().toISOString(),
+        kind: "prompt",
+        prompt: compactPrompt(input.prompt),
+        amended_prompt: review.amended_prompt,
+        review: review.review,
+        confidence: review.confidence,
+        model: review.model,
+        backend: review.backend
+      }
+    ].slice(-limit)
+  });
 }
 
 function buildClaudeReviewPrompt({ prompt, conversation, gitContext, resumed, maxContextChars }) {
@@ -139,6 +170,7 @@ function formatAdditionalContext(review) {
     "",
     "A senior peer reviewed this prompt before execution. Treat the brief below as guidance for how to do the work; the user's own message remains authoritative if they conflict.",
     "This Peer hook has already run for the current prompt. Do not invoke the Peer skill or CLI again just because the prompt contains [peer].",
+    "Briefly acknowledge the Peer review in your visible response before acting, summarizing the key adjustment in one short sentence so the user can see what Fable added.",
     "",
     "## Amended brief",
     review.amended_prompt,
@@ -158,6 +190,7 @@ module.exports = {
   buildRetryPrompt,
   formatAdditionalContext,
   isReturnPromptRetryable,
+  persistPeerReview,
   runPeerReview,
   shouldEnableWorkspaceTools
 };

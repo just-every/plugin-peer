@@ -12,6 +12,7 @@ const { submittedPrompt } = require("../scripts/lib/context");
 const { hasPeerInvocation, stripPeerInvocation } = require("../scripts/lib/invocation");
 const { boundedPath, createWorkspaceTools } = require("../scripts/lib/workspace-tools");
 const { formatAdditionalContext, runPeerReview, shouldEnableWorkspaceTools } = require("../scripts/lib/peer-client");
+const { readSessionState } = require("../scripts/lib/session-state");
 
 function fakeCreateToolFunction(fn, _description, _params, _returns, name) {
   return { name, function: fn };
@@ -54,6 +55,15 @@ test("formatAdditionalContext includes amended prompt and notes", () => {
   assert.match(text, /Added verification/);
 });
 
+test("formatAdditionalContext asks Codex to visibly summarize the peer review", () => {
+  const text = formatAdditionalContext({
+    amended_prompt: "Do it with tests.",
+    review: "Added verification.",
+    confidence: "high"
+  });
+  assert.match(text, /Briefly acknowledge the Peer review/);
+});
+
 test("workspace tools are enabled only when the prompt asks for workspace context", () => {
   assert.strictEqual(shouldEnableWorkspaceTools({ prompt: "Improve this prompt." }), false);
   assert.strictEqual(shouldEnableWorkspaceTools({ prompt: "Inspect src/parser.js before improving this." }), true);
@@ -92,7 +102,10 @@ test("UserPromptSubmit hook noops without [peer]", () => {
 
 test("runPeerReview retries until return_prompt is called", async () => {
   const previous = process.env.ANTHROPIC_API_KEY;
+  const previousHome = process.env.CODEX_HOME;
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "peer-retry-"));
   process.env.ANTHROPIC_API_KEY = "test-key";
+  process.env.CODEX_HOME = home;
   let calls = 0;
   let secondMessages = null;
   try {
@@ -139,5 +152,43 @@ test("runPeerReview retries until return_prompt is called", async () => {
   } finally {
     if (previous === undefined) delete process.env.ANTHROPIC_API_KEY;
     else process.env.ANTHROPIC_API_KEY = previous;
+    if (previousHome === undefined) delete process.env.CODEX_HOME;
+    else process.env.CODEX_HOME = previousHome;
+  }
+});
+
+test("runPeerReview persists bounded peer review history", async () => {
+  const previousKey = process.env.ANTHROPIC_API_KEY;
+  const previousHome = process.env.CODEX_HOME;
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "peer-history-"));
+  process.env.ANTHROPIC_API_KEY = "test-key";
+  process.env.CODEX_HOME = home;
+  try {
+    const input = { prompt: "prompt 0", cwd: process.cwd(), session_id: "peer-history-session" };
+    for (let index = 0; index < 55; index += 1) {
+      await runPeerReview({ ...input, prompt: `prompt ${index}` }, {
+        config: { model: "test-model", timeoutMs: 1000, maxContextChars: 4000 },
+        createToolFunction: fakeCreateToolFunction,
+        ensemble: {
+          ensembleRequest(_messages, agent) {
+            const returnTool = agent.tools.find((tool) => tool.name === "return_prompt");
+            returnTool.function(`prompt ${index} improved`, `review ${index}`, "high");
+            return (async function* stream() {})();
+          },
+          async ensembleResult() {
+            return { completed: true, message: "done", requestStatus: "completed", messageIds: new Set(), startTime: new Date() };
+          }
+        }
+      });
+    }
+    const state = readSessionState("peer", input);
+    assert.strictEqual(state.reviews.length, 50);
+    assert.strictEqual(state.reviews[0].prompt, "prompt 5");
+    assert.strictEqual(state.reviews[49].amended_prompt, "prompt 54 improved");
+  } finally {
+    if (previousKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = previousKey;
+    if (previousHome === undefined) delete process.env.CODEX_HOME;
+    else process.env.CODEX_HOME = previousHome;
   }
 });
