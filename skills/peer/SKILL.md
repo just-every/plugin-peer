@@ -16,7 +16,7 @@ Peer also has a manual CLI:
 node scripts/peer.js "Improve this prompt before Codex acts on it."
 ```
 
-Peer asks Fable 5 (via `claude -p` with read-only tools) to inspect the prompt and workspace, then returns an amended brief. It does not edit files. Reviews in the same Codex session resume one persistent Fable session, so Fable remembers earlier prompts and findings.
+Peer asks Fable 5 (via `claude -p` with read-only tools, including web search/fetch) to inspect the prompt, workspace, and current external facts when useful, then returns an amended brief. It does not edit files. Reviews in the same Codex session resume one persistent Fable session, so Fable remembers earlier prompts and findings.
 
 The automatic hook injects the peer review as additional context; it does not replace the user's submitted prompt.
 

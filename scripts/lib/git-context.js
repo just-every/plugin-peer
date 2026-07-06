@@ -49,7 +49,7 @@ function collectGitContext(cwd, { includeDiff = false, maxDiffBytes = 20000 } = 
   return [
     "## Workspace git state",
     "",
-    "Collected by the hook at review time. You have no shell access; use Read/Glob/Grep for anything deeper.",
+    "Collected by the hook at review time. You have no shell access; use Read/Glob/Grep/LS for workspace details and WebSearch/WebFetch for current external facts.",
     "",
     sections.join("\n\n")
   ].join("\n");

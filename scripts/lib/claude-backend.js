@@ -4,8 +4,10 @@ const { spawnSync } = require("node:child_process");
 
 // No Bash: the read-only guarantee is structural. Git state is collected by
 // the hook process (see git-context.js) and injected into the prompt instead.
-const READ_ONLY_TOOLS = "Read,Glob,Grep";
-const READ_ONLY_ALLOWED_TOOLS = "Read,Glob,Grep";
+// WebSearch/WebFetch are read-only in Claude Code and let Fable check current
+// external facts without granting shell or filesystem mutation.
+const READ_ONLY_TOOLS = "Read,Glob,Grep,LS,WebSearch,WebFetch";
+const READ_ONLY_ALLOWED_TOOLS = "Read,Glob,Grep,LS,WebSearch,WebFetch";
 // CLAUDECODE/CLAUDE_CODE_* would confuse the child into nested-session mode.
 // ANTHROPIC_API_KEY/AUTH_TOKEN would silently switch billing from the user's
 // subscription login to raw API billing; the claude backend never needs them.

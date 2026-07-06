@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "Peer",
     "shortDescription": "Fable prompt peer review for Codex",
-    "longDescription": "Peer uses Codex hooks and the Claude Code CLI (claude -p) to ask Fable 5 to review each [peer] prompt before the turn. Fable inspects the workspace with read-only tools, keeps a persistent resumable session per Codex thread, and returns a structured amended brief that Peer injects as additional context. The peer skill can also be used manually for a second opinion.",
+    "longDescription": "Peer uses Codex hooks and the Claude Code CLI (claude -p) to ask Fable 5 to review each [peer] prompt before the turn. Fable inspects the workspace and current web context with read-only tools, keeps a persistent resumable session per Codex thread, and returns a structured amended brief that Peer injects as additional context. The peer skill can also be used manually for a second opinion.",
     "developerName": "Just Every",
     "category": "Developer Tools",
     "capabilities": [

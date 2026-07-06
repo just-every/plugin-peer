@@ -65,9 +65,10 @@ test("buildClaudeArgs is read-only, structured, and resumable", () => {
   assert.ok(args.includes("--json-schema"));
   assert.ok(args.includes("--permission-mode") && args.includes("dontAsk"));
   const tools = args[args.indexOf("--tools") + 1];
-  assert.strictEqual(tools, "Read,Glob,Grep");
+  assert.strictEqual(tools, "Read,Glob,Grep,LS,WebSearch,WebFetch");
   const allowed = args[args.indexOf("--allowedTools") + 1];
-  assert.ok(!/Bash|Write|Edit/.test(tools + allowed), "no shell or write tools may reach the child");
+  assert.strictEqual(allowed, "Read,Glob,Grep,LS,WebSearch,WebFetch");
+  assert.ok(!/Bash|Write|Edit|MultiEdit|NotebookEdit|TodoWrite/.test(tools + allowed), "no shell or write tools may reach the child");
   assert.ok(args.includes("--strict-mcp-config"), "workspace MCP configs must be ignored");
   assert.strictEqual(args[args.indexOf("--setting-sources") + 1], "user", "workspace settings must not expand permissions");
   assert.strictEqual(args[args.indexOf("--resume") + 1], "abc");
