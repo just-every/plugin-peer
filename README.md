@@ -28,7 +28,7 @@ PEER_BACKEND=auto            # auto (default) | claude | ensemble
 PEER_CLAUDE_BIN=claude       # path to the Claude Code CLI
 PEER_MODEL=claude-fable-5    # model passed to the backend
 PEER_EFFORT=                 # optional --effort for the claude backend (low..max)
-PEER_TIMEOUT_MS=180000       # per-review timeout
+PEER_TIMEOUT_MS=1200000      # per-review timeout (20 minutes)
 PEER_MAX_CONTEXT_CHARS=12000 # cap on conversation context sent with the prompt
 ```
 

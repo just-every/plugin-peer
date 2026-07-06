@@ -62,7 +62,7 @@ function config() {
     claudeBin: process.env.PEER_CLAUDE_BIN || "claude",
     model: process.env.PEER_MODEL || "claude-fable-5",
     effort: process.env.PEER_EFFORT || "",
-    timeoutMs: positiveInt(process.env.PEER_TIMEOUT_MS, 180000),
+    timeoutMs: positiveInt(process.env.PEER_TIMEOUT_MS, 1200000),
     maxContextChars: positiveInt(process.env.PEER_MAX_CONTEXT_CHARS, 12000)
   };
 }
