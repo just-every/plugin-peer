@@ -60,16 +60,18 @@ test("workspace tools are enabled only when the prompt asks for workspace contex
   assert.strictEqual(shouldEnableWorkspaceTools({ prompt: "Improve this prompt.", enable_workspace_tools: true }), true);
 });
 
-test("peer hook invocation requires $peer and strips it from review input", () => {
+test("peer hook invocation requires [peer] and strips it from review input", () => {
   assert.strictEqual(hasPeerInvocation("Please review this"), false);
-  assert.strictEqual(hasPeerInvocation("$peer Please review this"), true);
+  assert.strictEqual(hasPeerInvocation("[peer] Please review this"), true);
+  assert.strictEqual(hasPeerInvocation("$peer Please review this"), false);
   assert.strictEqual(hasPeerInvocation("Peer:peer Please review this"), false);
-  assert.strictEqual(stripPeerInvocation("$peer Please review this"), "Please review this");
+  assert.strictEqual(stripPeerInvocation("[peer] Please review this"), "Please review this");
+  assert.strictEqual(stripPeerInvocation("$peer Please review this"), "$peer Please review this");
   assert.strictEqual(stripPeerInvocation("Peer:peer Please review this"), "Peer:peer Please review this");
-  assert.strictEqual(stripPeerInvocation("Run $peer: on this prompt"), "Run on this prompt");
+  assert.strictEqual(stripPeerInvocation("Run [peer]: on this prompt"), "Run on this prompt");
 });
 
-test("UserPromptSubmit hook noops without $peer", () => {
+test("UserPromptSubmit hook noops without [peer]", () => {
   const hookInput = {
     hook_event_name: "UserPromptSubmit",
     cwd: process.cwd(),

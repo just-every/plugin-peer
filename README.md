@@ -2,7 +2,7 @@
 
 Peer asks Fable 5 to review a Codex prompt before the turn runs, then injects the amended brief as hidden additional context. Fable oversees; Codex executes.
 
-The hook is opt-in per prompt. Start a prompt with `$peer` or include `$peer` in the prompt to activate review for that turn. Prompts without `$peer` are passed through unchanged and do not call Fable.
+The hook is opt-in per prompt. Start a prompt with `[peer]` or include `[peer]` in the prompt to activate review for that turn. Prompts without `[peer]` are passed through unchanged and do not call Fable.
 
 It does not replace the submitted prompt because Codex hook output does not currently support direct prompt replacement. It uses the supported `UserPromptSubmit` `additionalContext` path.
 
@@ -50,7 +50,7 @@ CLI invocations from the same `cwd` resume the same reviewer session.
 
 ## Hooks
 
-`hooks/hooks.json` registers a `UserPromptSubmit` command hook. The hook is a no-op unless the submitted prompt contains `$peer`. Plugin installation and hook trust are handled by Codex; this repository does not install or trust hooks automatically.
+`hooks/hooks.json` registers a `UserPromptSubmit` command hook. The hook is a no-op unless the submitted prompt contains `[peer]`. Plugin installation and hook trust are handled by Codex; this repository does not install or trust hooks automatically.
 
 ## Development
 

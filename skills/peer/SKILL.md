@@ -5,7 +5,10 @@ description: Use when the user wants Fable 5 to act as a real-time peer programm
 
 # Peer
 
-Peer is primarily a hook. Users activate the hook by including the literal token `$peer` in their prompt. Do not treat `Peer:peer`/`peer:peer` as hook activation; those names only load this informational skill.
+Peer has two modes:
+
+- Hook mode: users activate the hook by including the literal token `[peer]` in their prompt. Do not treat `Peer:peer`/`peer:peer` as hook activation.
+- Skill mode: when this skill is explicitly selected, run Peer as a manual second-opinion reviewer.
 
 Peer also has a manual CLI:
 
@@ -19,14 +22,12 @@ The automatic hook injects the peer review as additional context; it does not re
 
 ## Skill Behavior
 
-If this skill is explicitly loaded, explain how Peer works or how to activate it. Do not run the Peer CLI merely because this skill was selected; hook activation must happen before the turn through `$peer`.
-
-Only run the manual CLI if the user explicitly asks to run Peer from the terminal. Use the plugin root as the working directory and pass the prompt as JSON:
+If this skill is explicitly loaded for a user request, run the Peer CLI before answering so Fable can provide a second opinion. Use the plugin root as the working directory and pass the user's prompt as JSON:
 
 ```bash
 printf '%s' '{"prompt":"<user prompt>","cwd":"<current repo cwd>"}' | node scripts/peer.js
 ```
 
-Then use the returned `amended_prompt` and `review` in your response or next action.
+Then use the returned `amended_prompt` and `review` in your response or next action. If the user is only asking how Peer works, answer from this documentation instead of running the CLI.
 
-For hook-based use, the user must place `$peer` in their prompt. Prompts without `$peer` are intentionally passed through unchanged.
+For hook-based use, the user must place `[peer]` in their prompt. Prompts without `[peer]` are intentionally passed through unchanged.

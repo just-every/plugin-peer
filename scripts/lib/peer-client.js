@@ -138,7 +138,7 @@ function formatAdditionalContext(review) {
     "# Peer prompt review (Fable)",
     "",
     "A senior peer reviewed this prompt before execution. Treat the brief below as guidance for how to do the work; the user's own message remains authoritative if they conflict.",
-    "This Peer hook has already run for the current prompt. Do not invoke the Peer skill or CLI again just because the prompt contains $peer.",
+    "This Peer hook has already run for the current prompt. Do not invoke the Peer skill or CLI again just because the prompt contains [peer].",
     "",
     "## Amended brief",
     review.amended_prompt,
